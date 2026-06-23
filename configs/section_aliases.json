@@ -1,0 +1,97 @@
+{
+  "_comment": "Map logical section keys to every heading variant that may appear in a resume. Add new domains (marketing, HR, etc.) by appending keys without touching Python code.",
+
+  "skills": [
+    "SKILLS",
+    "TECHNICAL SKILLS",
+    "CORE COMPETENCIES",
+    "COMPETENCIES",
+    "KEY SKILLS",
+    "SKILL SET",
+    "SKILLS & EXPERTISE",
+    "SKILLS AND EXPERTISE",
+    "TOOLS & TECHNOLOGIES",
+    "TOOLS AND TECHNOLOGIES",
+    "TECHNOLOGIES",
+    "EXPERTISE",
+    "AREAS OF EXPERTISE",
+    "PROFESSIONAL SKILLS",
+    "DOMAIN SKILLS",
+    "FUNCTIONAL SKILLS"
+  ],
+
+  "experience": [
+    "EXPERIENCE",
+    "WORK EXPERIENCE",
+    "PROFESSIONAL EXPERIENCE",
+    "EMPLOYMENT HISTORY",
+    "CAREER HISTORY",
+    "WORK HISTORY",
+    "RELEVANT EXPERIENCE",
+    "INDUSTRY EXPERIENCE"
+  ],
+
+  "projects": [
+    "PROJECTS",
+    "KEY PROJECTS",
+    "PERSONAL PROJECTS",
+    "ACADEMIC PROJECTS",
+    "SELECTED PROJECTS",
+    "PROJECT EXPERIENCE",
+    "NOTABLE PROJECTS"
+  ],
+
+  "education": [
+    "EDUCATION",
+    "ACADEMIC BACKGROUND",
+    "ACADEMIC QUALIFICATIONS",
+    "QUALIFICATIONS",
+    "EDUCATIONAL BACKGROUND"
+  ],
+
+  "certifications": [
+    "CERTIFICATIONS",
+    "CERTIFICATES",
+    "LICENSES",
+    "LICENSES & CERTIFICATIONS",
+    "PROFESSIONAL CERTIFICATIONS",
+    "ACCREDITATIONS"
+  ],
+
+  "summary": [
+    "SUMMARY",
+    "PROFESSIONAL SUMMARY",
+    "CAREER SUMMARY",
+    "OBJECTIVE",
+    "CAREER OBJECTIVE",
+    "PROFILE",
+    "PROFESSIONAL PROFILE",
+    "ABOUT ME",
+    "OVERVIEW"
+  ],
+
+  "achievements": [
+    "ACHIEVEMENTS",
+    "ACCOMPLISHMENTS",
+    "KEY ACHIEVEMENTS",
+    "AWARDS",
+    "AWARDS & HONORS",
+    "HONORS",
+    "RECOGNITION"
+  ],
+
+  "publications": [
+    "PUBLICATIONS",
+    "RESEARCH",
+    "PAPERS",
+    "ARTICLES",
+    "RESEARCH & PUBLICATIONS"
+  ],
+
+  "volunteer": [
+    "VOLUNTEER",
+    "VOLUNTEER EXPERIENCE",
+    "COMMUNITY SERVICE",
+    "SOCIAL WORK"
+  ]
+}
