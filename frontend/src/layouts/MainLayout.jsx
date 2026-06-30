@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import Navbar from '../components/common/Navbar';
-import Footer from '../components/common/Footer';
 import Sidebar from '../components/common/Sidebar';
 import AnimatedOutlet from '../components/layout/AnimatedOutlet';
 
@@ -18,7 +17,6 @@ function MainLayout() {
           <div className="flex-1">
             <AnimatedOutlet />
           </div>
-          <Footer />
         </main>
       </div>
     </div>

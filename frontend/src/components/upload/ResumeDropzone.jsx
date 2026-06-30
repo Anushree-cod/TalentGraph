@@ -3,17 +3,13 @@ import { motion } from 'framer-motion';
 import { CheckCircle2, FileText, Upload, X } from 'lucide-react';
 
 const MAX_SIZE_MB = 5;
-const ACCEPTED_TYPES = [
-  'application/pdf',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-];
-const ACCEPTED_EXT = /\.(pdf|doc|docx)$/i;
+const ACCEPTED_TYPES = ['application/pdf'];
+const ACCEPTED_EXT = /\.pdf$/i;
 
 function validateFile(file) {
   if (!file) return 'No file selected.';
   const validType = ACCEPTED_TYPES.includes(file.type) || ACCEPTED_EXT.test(file.name);
-  if (!validType) return 'Please upload a PDF or DOCX file.';
+  if (!validType) return 'Please upload a PDF file.';
   if (file.size > MAX_SIZE_MB * 1024 * 1024) return `File must be under ${MAX_SIZE_MB} MB.`;
   return null;
 }
@@ -102,7 +98,7 @@ function ResumeDropzone({ file, onFileSelect }) {
               <span className="font-medium text-violet-600 dark:text-violet-400">browse</span>
             </p>
             <p className="mt-2 text-center text-[13px] tg-muted">
-              PDF or DOCX, up to {MAX_SIZE_MB} MB · Parsed locally
+              PDF only, up to {MAX_SIZE_MB} MB · Parsed locally
             </p>
           </>
         )}
@@ -110,7 +106,7 @@ function ResumeDropzone({ file, onFileSelect }) {
         <input
           ref={inputRef}
           type="file"
-          accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          accept=".pdf,application/pdf"
           className="sr-only"
           onChange={handleChange}
         />

@@ -94,10 +94,10 @@ function ApplyJobPage() {
 
         <form onSubmit={handleSubmit} className="tg-surface mt-8 space-y-4 p-6 sm:p-8">
           <div>
-            <label className="tg-label">Resume (PDF/DOCX) *</label>
+            <label className="tg-label">Resume (PDF) *</label>
             <input
               type="file"
-              accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+              accept=".pdf,application/pdf"
               onChange={(e) => setResumeFile(e.target.files?.[0] || null)}
               required
               className="tg-input mt-2 block w-full"
