@@ -1,0 +1,32 @@
+alias,canonical_skill
+python,Python
+py,Python
+javascript,JavaScript
+js,JavaScript
+typescript,TypeScript
+java,Java
+react,React
+reactjs,React
+nodejs,Node.js
+node.js,Node.js
+docker,Docker
+kubernetes,Kubernetes
+k8s,Kubernetes
+sql,SQL
+mysql,MySQL
+postgresql,PostgreSQL
+mongodb,MongoDB
+aws,AWS
+azure,Azure
+gcp,GCP
+fastapi,FastAPI
+django,Django
+flask,Flask
+git,Git
+linux,Linux
+html,HTML
+css,CSS
+tensorflow,TensorFlow
+pytorch,PyTorch
+machine learning,Machine Learning
+data analysis,Data Analysis

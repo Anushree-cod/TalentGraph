@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Profile Analyzer — AI Recruiter Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- ── Header ─────────────────────────────────────────────────────── -->
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#58a6ff" stroke-width="2">
+                    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+                </svg>
+                <h1>GitHub Profile Analyzer</h1>
+            </div>
+            <div class="status-badges">
+                <span class="badge {{ 'badge-success' if github_authenticated else 'badge-warning' }}">
+                    GitHub: {{ '🔑 Authenticated' if github_authenticated else '⚠️ Unauthenticated' }}
+                </span>
+                <span class="badge {{ 'badge-success' if gemini_available else 'badge-warning' }}">
+                    AI: {{ '🤖 Gemini Active' if gemini_available else '📝 Keyword Mode' }}
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ── Main Content ───────────────────────────────────────────────── -->
+    <main>
+        <!-- Input Form -->
+        <section class="card input-card">
+            <h2>Analyze a GitHub Profile</h2>
+            <form id="analyzeForm">
+                <div class="form-group">
+                    <label for="github_url">GitHub Profile URL</label>
+                    <input 
+                        type="text" 
+                        id="github_url" 
+                        placeholder="https://github.com/username or just username"
+                        required
+                    >
+                </div>
+                <div class="form-group">
+                    <label for="job_description">Job Description <span class="optional">(optional)</span></label>
+                    <textarea 
+                        id="job_description" 
+                        rows="6"
+                        placeholder="Paste the job description here to match skills against the candidate's profile..."
+                    ></textarea>
+                </div>
+                <button type="submit" id="analyzeBtn">
+                    <span class="btn-text">🔍 Analyze Profile</span>
+                    <span class="btn-loading" style="display:none;">
+                        <span class="spinner"></span> Analyzing...
+                    </span>
+                </button>
+            </form>
+        </section>
+
+        <!-- Loading State -->
+        <section class="card loading-card" id="loadingCard" style="display:none;">
+            <div class="loading-content">
+                <div class="loading-spinner"></div>
+                <h3>Fetching GitHub Data...</h3>
+                <p id="loadingMessage">This may take 10-30 seconds depending on the profile size.</p>
+            </div>
+        </section>
+
+        <!-- Error State -->
+        <section class="card error-card" id="errorCard" style="display:none;">
+            <h3>❌ Error</h3>
+            <p id="errorMessage"></p>
+        </section>
+
+        <!-- Results Section -->
+        <div id="resultsSection" style="display:none;">
+            
+            <!-- Profile Overview -->
+            <section class="card profile-card">
+                <div class="profile-header">
+                    <img id="profileAvatar" src="" alt="Avatar" class="avatar">
+                    <div class="profile-info">
+                        <h2 id="profileName"></h2>
+                        <p id="profileBio" class="bio"></p>
+                        <div class="profile-meta">
+                            <span id="profileLocation"></span>
+                            <span id="profileCompany"></span>
+                            <a id="profileLink" href="" target="_blank">View on GitHub →</a>
+                        </div>
+                        <div class="profile-stats">
+                            <div class="stat">
+                                <span class="stat-value" id="statRepos">0</span>
+                                <span class="stat-label">Repos</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value" id="statFollowers">0</span>
+                                <span class="stat-label">Followers</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value" id="statFollowing">0</span>
+                                <span class="stat-label">Following</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value" id="statContributions">0</span>
+                                <span class="stat-label">Contributions</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Scores Section -->
+            <section class="card scores-card">
+                <h2>📊 Profile Scores</h2>
+                <div class="scores-grid">
+                    <div class="score-item">
+                        <div class="score-circle" id="scoreOverall">
+                            <svg viewBox="0 0 36 36" class="score-svg">
+                                <path class="score-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                <path class="score-fill" id="scoreOverallFill" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                            </svg>
+                            <span class="score-text" id="scoreOverallText">0</span>
+                        </div>
+                        <span class="score-label">Overall</span>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-circle">
+                            <svg viewBox="0 0 36 36" class="score-svg">
+                                <path class="score-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                <path class="score-fill score-activity" id="scoreActivityFill" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                            </svg>
+                            <span class="score-text" id="scoreActivityText">0</span>
+                        </div>
+                        <span class="score-label">Activity</span>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-circle">
+                            <svg viewBox="0 0 36 36" class="score-svg">
+                                <path class="score-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                <path class="score-fill score-quality" id="scoreQualityFill" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                            </svg>
+                            <span class="score-text" id="scoreQualityText">0</span>
+                        </div>
+                        <span class="score-label">Quality</span>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-circle">
+                            <svg viewBox="0 0 36 36" class="score-svg">
+                                <path class="score-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                <path class="score-fill score-diversity" id="scoreDiversityFill" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                            </svg>
+                            <span class="score-text" id="scoreDiversityText">0</span>
+                        </div>
+                        <span class="score-label">Diversity</span>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-circle">
+                            <svg viewBox="0 0 36 36" class="score-svg">
+                                <path class="score-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                <path class="score-fill score-consistency" id="scoreConsistencyFill" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                            </svg>
+                            <span class="score-text" id="scoreConsistencyText">0</span>
+                        </div>
+                        <span class="score-label">Consistency</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Skills -->
+            <section class="card skills-card">
+                <h2>🛠️ Extracted Skills & Technologies</h2>
+                <div class="skills-container" id="skillsContainer"></div>
+            </section>
+
+            <!-- Visualizations -->
+            <section class="card viz-card">
+                <h2>📈 Visualizations</h2>
+                <div class="viz-grid" id="vizGrid"></div>
+            </section>
+
+            <!-- AI Analysis (only if JD was provided) -->
+            <section class="card ai-card" id="aiCard" style="display:none;">
+                <h2>🤖 AI Job Match Analysis</h2>
+                <div class="match-header">
+                    <div class="match-percentage" id="matchPercentage">0%</div>
+                    <div class="match-recommendation" id="matchRecommendation"></div>
+                    <div class="match-method" id="matchMethod"></div>
+                </div>
+
+                <div class="ai-sections">
+                    <!-- Matching Skills -->
+                    <div class="ai-section">
+                        <h3>✅ Matching Skills</h3>
+                        <div class="skill-matches" id="matchingSkills"></div>
+                    </div>
+
+                    <!-- Missing Skills -->
+                    <div class="ai-section">
+                        <h3>❌ Missing Skills</h3>
+                        <div class="missing-skills" id="missingSkills"></div>
+                    </div>
+
+                    <!-- Relevant Projects -->
+                    <div class="ai-section">
+                        <h3>📂 Relevant Projects</h3>
+                        <div id="relevantProjects"></div>
+                    </div>
+
+                    <!-- Strengths & Weaknesses -->
+                    <div class="strengths-weaknesses">
+                        <div class="ai-section">
+                            <h3>💪 Strengths</h3>
+                            <ul id="strengthsList"></ul>
+                        </div>
+                        <div class="ai-section">
+                            <h3>⚠️ Areas for Growth</h3>
+                            <ul id="weaknessesList"></ul>
+                        </div>
+                    </div>
+
+                    <!-- AI Summary -->
+                    <div class="ai-section summary-section">
+                        <h3>📝 Summary</h3>
+                        <p id="aiSummary"></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Metadata -->
+            <section class="card meta-card">
+                <h2>ℹ️ Analysis Metadata</h2>
+                <pre id="metadataContent"></pre>
+            </section>
+        </div>
+    </main>
+
+    <!-- ── Footer ─────────────────────────────────────────────────────── -->
+    <footer>
+        <p>GitHub Profile Analyzer — AI Recruiter Backend v1.0.0</p>
+    </footer>
+
+    <!-- ── Script ─────────────────────────────────────────────────────── -->
+    <script>
+        const form = document.getElementById('analyzeForm');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const loadingCard = document.getElementById('loadingCard');
+        const errorCard = document.getElementById('errorCard');
+        const resultsSection = document.getElementById('resultsSection');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const githubUrl = document.getElementById('github_url').value.trim();
+            const jobDescription = document.getElementById('job_description').value.trim();
+
+            if (!githubUrl) return;
+
+            // Show loading
+            analyzeBtn.querySelector('.btn-text').style.display = 'none';
+            analyzeBtn.querySelector('.btn-loading').style.display = 'inline-flex';
+            analyzeBtn.disabled = true;
+            loadingCard.style.display = 'block';
+            errorCard.style.display = 'none';
+            resultsSection.style.display = 'none';
+
+            try {
+                const payload = {
+                    github_url: githubUrl,
+                };
+                if (jobDescription) {
+                    payload.job_description = jobDescription;
+                }
+
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.detail || 'Analysis failed');
+                }
+
+                const data = await response.json();
+                renderResults(data);
+
+            } catch (error) {
+                errorCard.style.display = 'block';
+                document.getElementById('errorMessage').textContent = error.message;
+            } finally {
+                loadingCard.style.display = 'none';
+                analyzeBtn.querySelector('.btn-text').style.display = 'inline';
+                analyzeBtn.querySelector('.btn-loading').style.display = 'none';
+                analyzeBtn.disabled = false;
+            }
+        });
+
+        function renderResults(data) {
+            resultsSection.style.display = 'block';
+
+            // ── Profile ──────────────────────────────────────────
+            const profile = data.profile;
+            document.getElementById('profileAvatar').src = profile.avatar_url || '';
+            document.getElementById('profileName').textContent = profile.name || profile.username;
+            document.getElementById('profileBio').textContent = profile.bio || '';
+            document.getElementById('profileLocation').textContent = profile.location ? `📍 ${profile.location}` : '';
+            document.getElementById('profileCompany').textContent = profile.company ? `🏢 ${profile.company}` : '';
+            document.getElementById('profileLink').href = profile.html_url;
+            document.getElementById('statRepos').textContent = profile.public_repos;
+            document.getElementById('statFollowers').textContent = profile.followers;
+            document.getElementById('statFollowing').textContent = profile.following;
+            document.getElementById('statContributions').textContent = data.contributions?.total_contributions || 0;
+
+            // ── Scores ───────────────────────────────────────────
+            const scores = data.scores;
+            animateScore('scoreOverall', scores.overall_score);
+            animateScore('scoreActivity', scores.activity_score);
+            animateScore('scoreQuality', scores.quality_score);
+            animateScore('scoreDiversity', scores.diversity_score);
+            animateScore('scoreConsistency', scores.consistency_score);
+
+            // ── Skills ───────────────────────────────────────────
+            const skillsContainer = document.getElementById('skillsContainer');
+            skillsContainer.innerHTML = '';
+            (data.extracted_skills || []).forEach(skill => {
+                const tag = document.createElement('span');
+                tag.className = 'skill-tag';
+                tag.textContent = skill;
+                skillsContainer.appendChild(tag);
+            });
+
+            // ── Visualizations ───────────────────────────────────
+            const vizGrid = document.getElementById('vizGrid');
+            vizGrid.innerHTML = '';
+            const viz = data.visualizations || {};
+            const charts = [
+                { key: 'language_chart', title: 'Language Distribution' },
+                { key: 'stars_chart', title: 'Top Repositories' },
+                { key: 'contribution_heatmap', title: 'Contribution Heatmap' },
+                { key: 'activity_timeline', title: 'Activity Timeline' },
+                { key: 'skill_radar', title: 'Skill Match Radar' },
+            ];
+            charts.forEach(chart => {
+                if (viz[chart.key]) {
+                    const div = document.createElement('div');
+                    div.className = 'viz-item';
+                    div.innerHTML = `
+                        <h4>${chart.title}</h4>
+                        <img src="data:image/png;base64,${viz[chart.key]}" alt="${chart.title}">
+                    `;
+                    vizGrid.appendChild(div);
+                }
+            });
+
+            // ── AI Analysis ──────────────────────────────────────
+            if (data.ai_analysis) {
+                const ai = data.ai_analysis;
+                document.getElementById('aiCard').style.display = 'block';
+
+                // Match percentage with color
+                const matchPct = document.getElementById('matchPercentage');
+                matchPct.textContent = `${ai.match_percentage}%`;
+                matchPct.className = `match-percentage ${getMatchClass(ai.match_percentage)}`;
+
+                document.getElementById('matchRecommendation').textContent = ai.recommendation;
+                document.getElementById('matchMethod').textContent = 
+                    `Analysis via: ${ai.analysis_method === 'gemini' ? '🤖 Gemini AI' : '📝 Keyword Matching'}`;
+
+                // Matching skills
+                const matchingDiv = document.getElementById('matchingSkills');
+                matchingDiv.innerHTML = '';
+                ai.matching_skills.filter(s => s.found).forEach(skill => {
+                    const tag = document.createElement('div');
+                    tag.className = 'skill-match-item found';
+                    tag.innerHTML = `
+                        <span class="skill-name">✅ ${skill.skill}</span>
+                        ${skill.evidence.length ? `<span class="skill-evidence">Found in: ${skill.evidence.join(', ')}</span>` : ''}
+                    `;
+                    matchingDiv.appendChild(tag);
+                });
+
+                // Missing skills
+                const missingDiv = document.getElementById('missingSkills');
+                missingDiv.innerHTML = '';
+                ai.missing_skills.forEach(skill => {
+                    const tag = document.createElement('span');
+                    tag.className = 'skill-tag missing';
+                    tag.textContent = skill;
+                    missingDiv.appendChild(tag);
+                });
+
+                // Relevant projects
+                const projectsDiv = document.getElementById('relevantProjects');
+                projectsDiv.innerHTML = '';
+                (ai.relevant_projects || []).slice(0, 5).forEach(project => {
+                    const div = document.createElement('div');
+                    div.className = 'project-item';
+                    div.innerHTML = `
+                        <strong>${project.repo_name}</strong>
+                        <p>${project.relevance}</p>
+                    `;
+                    projectsDiv.appendChild(div);
+                });
+
+                // Strengths
+                const strengthsList = document.getElementById('strengthsList');
+                strengthsList.innerHTML = '';
+                (ai.strengths || []).forEach(s => {
+                    const li = document.createElement('li');
+                    li.textContent = s;
+                    strengthsList.appendChild(li);
+                });
+
+                // Weaknesses
+                const weaknessesList = document.getElementById('weaknessesList');
+                weaknessesList.innerHTML = '';
+                (ai.weaknesses || []).forEach(w => {
+                    const li = document.createElement('li');
+                    li.textContent = w;
+                    weaknessesList.appendChild(li);
+                });
+
+                // Summary
+                document.getElementById('aiSummary').textContent = ai.summary;
+            } else {
+                document.getElementById('aiCard').style.display = 'none';
+            }
+
+            // ── Metadata ─────────────────────────────────────────
+            document.getElementById('metadataContent').textContent = 
+                JSON.stringify(data.metadata, null, 2);
+
+            // Scroll to results
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function animateScore(prefix, value) {
+            const fill = document.getElementById(`${prefix}Fill`);
+            const text = document.getElementById(`${prefix}Text`);
+            
+            if (fill && text) {
+                // Animate the circle fill
+                setTimeout(() => {
+                    fill.style.strokeDasharray = `${value}, 100`;
+                }, 100);
+                
+                // Animate the number
+                let current = 0;
+                const increment = value / 30;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= value) {
+                        current = value;
+                        clearInterval(timer);
+                    }
+                    text.textContent = Math.round(current);
+                }, 30);
+            }
+        }
+
+        function getMatchClass(pct) {
+            if (pct >= 75) return 'match-strong';
+            if (pct >= 50) return 'match-good';
+            if (pct >= 30) return 'match-partial';
+            return 'match-weak';
+        }
+    </script>
+</body>
+</html>

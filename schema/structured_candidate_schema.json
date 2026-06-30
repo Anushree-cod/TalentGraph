@@ -1,0 +1,201 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "StructuredCandidate",
+  "description": "Member-1 output contract for TalentGraph MVP (structured_candidates.jsonl)",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "candidate_id",
+    "headline",
+    "current_title",
+    "years_experience",
+    "location",
+    "skills",
+    "summary_text",
+    "career_text",
+    "career_history",
+    "education",
+    "certifications",
+    "languages",
+    "open_to_work",
+    "github_activity_score",
+    "profile_text"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "description": "Structured candidate schema version"
+    },
+    "candidate_id": {
+      "type": "string",
+      "description": "Unique candidate identifier (join key for GitHub analysis)"
+    },
+    "headline": {
+      "type": "string",
+      "description": "Profile headline from source data"
+    },
+    "current_title": {
+      "type": "string",
+      "description": "Most recent job title"
+    },
+    "years_experience": {
+      "type": "number",
+      "description": "Total years of professional experience"
+    },
+    "location": {
+      "type": "string",
+      "description": "Candidate location (city/region)"
+    },
+    "skills": {
+      "type": "array",
+      "description": "Canonical skill names (alias-mapped, snake_case, deduplicated)",
+      "items": {
+        "type": "string"
+      }
+    },
+    "raw_skills": {
+      "type": "array",
+      "description": "Original skill display names from source data (parallel to canonical skills)",
+      "items": {
+        "type": "string"
+      }
+    },
+    "skills_detailed": {
+      "type": "array",
+      "description": "Per-skill metadata preserved from source dataset",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string", "description": "Canonical skill name" },
+          "proficiency": {
+            "type": ["string", "null"],
+            "description": "beginner, intermediate, or advanced"
+          },
+          "endorsements": { "type": ["integer", "null"] },
+          "duration_months": { "type": ["integer", "null"] }
+        }
+      }
+    },
+    "summary_text": {
+      "type": "string",
+      "description": "Professional summary narrative"
+    },
+    "career_text": {
+      "type": "string",
+      "description": "Flattened career narrative with title, company, and role descriptions"
+    },
+    "career_history": {
+      "type": "array",
+      "description": "Structured employment history",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": { "type": ["string", "null"] },
+          "company": { "type": ["string", "null"] },
+          "start_date": { "type": ["string", "null"], "description": "ISO date YYYY-MM-DD" },
+          "end_date": { "type": ["string", "null"], "description": "ISO date or null if current" },
+          "is_current": { "type": "boolean" },
+          "industry": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "education": {
+      "type": "array",
+      "description": "Structured education records",
+      "items": {
+        "type": "object",
+        "properties": {
+          "degree": { "type": ["string", "null"] },
+          "field": { "type": ["string", "null"] },
+          "institution": { "type": ["string", "null"] },
+          "tier": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "certifications": {
+      "type": "array",
+      "description": "Professional certifications",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": ["string", "null"] },
+          "issuer": { "type": ["string", "null"] },
+          "year": { "type": ["integer", "null"] }
+        }
+      }
+    },
+    "languages": {
+      "type": "array",
+      "description": "Spoken/written languages",
+      "items": {
+        "type": "object",
+        "properties": {
+          "language": { "type": ["string", "null"] },
+          "proficiency": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "open_to_work": {
+      "type": "boolean",
+      "description": "Whether candidate is open to new opportunities"
+    },
+    "github_activity_score": {
+      "type": "number",
+      "description": "GitHub activity signal from redrob_signals (-1 if unavailable)"
+    },
+    "recruiter_signals": {
+      "type": "object",
+      "description": "Recruiter ranking signals from redrob_signals",
+      "properties": {
+        "expected_salary_range_inr_lpa": {
+          "type": "object",
+          "properties": {
+            "min": { "type": "number" },
+            "max": { "type": "number" }
+          }
+        },
+        "expected_salary_range": {
+          "type": "object",
+          "properties": {
+            "min": {
+              "type": "object",
+              "properties": {
+                "value": { "type": "number" },
+                "currency": { "type": "string" },
+                "unit": { "type": "string" }
+              }
+            },
+            "max": {
+              "type": "object",
+              "properties": {
+                "value": { "type": "number" },
+                "currency": { "type": "string" },
+                "unit": { "type": "string" }
+              }
+            }
+          }
+        },
+        "preferred_work_mode": {
+          "type": ["string", "null"],
+          "enum": ["remote", "hybrid", "onsite", "flexible", null]
+        },
+        "notice_period_days": { "type": ["integer", "null"] },
+        "willing_to_relocate": { "type": ["boolean", "null"] },
+        "skill_assessment_scores": {
+          "type": "object",
+          "additionalProperties": { "type": "number" }
+        },
+        "orphan_assessment_scores": {
+          "type": "object",
+          "additionalProperties": { "type": "number" },
+          "description": "Assessment scores for skills not present in canonical skills list"
+        }
+      }
+    },
+    "profile_text": {
+      "type": "string",
+      "description": "Embedding-friendly concatenation of headline, skills, summary, career, and education (primary input for JD matching)"
+    }
+  }
+}

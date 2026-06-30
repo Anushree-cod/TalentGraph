@@ -1,0 +1,43 @@
+skill,category
+Python,language
+JavaScript,language
+TypeScript,language
+Java,language
+Go,language
+C++,language
+C#,language
+Rust,language
+SQL,language
+HTML,language
+CSS,language
+React,framework
+Angular,framework
+Vue,framework
+Node.js,framework
+Django,framework
+Flask,framework
+FastAPI,framework
+Spring Boot,framework
+Docker,devops
+Kubernetes,devops
+AWS,cloud
+Azure,cloud
+GCP,cloud
+Git,devops
+Linux,devops
+MySQL,database
+PostgreSQL,database
+MongoDB,database
+Redis,database
+TensorFlow,ml
+PyTorch,ml
+Machine Learning,ml
+Deep Learning,ml
+Data Analysis,data
+Pandas,data
+NumPy,data
+REST API,backend
+GraphQL,backend
+Microservices,backend
+Agile,process
+Scrum,process

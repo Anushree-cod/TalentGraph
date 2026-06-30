@@ -1,0 +1,18 @@
+{
+  "llm": "large_language_models",
+  "llms": "large_language_models",
+  "large language models": "large_language_models",
+  "js": "javascript",
+  "node.js": "nodejs",
+  "node": "nodejs",
+  "react.js": "react",
+  "reactjs": "react",
+  "vue.js": "vue",
+  "vuejs": "vue",
+  "c++": "cpp",
+  "c#": "csharp",
+  "golang": "go",
+  "py": "python",
+  "aws": "amazon_web_services",
+  "k8s": "kubernetes"
+}
